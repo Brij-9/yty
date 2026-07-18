@@ -1,0 +1,48 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    env_file: .env
+    ports:
+      - "7860:7860"
+    volumes:
+      - openvideo-data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:7860/api/health')"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+
+  worker:
+    profiles: ["gpu"]
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+    env_file: .env
+    volumes:
+      - openvideo-data:/data
+      - openvideo-models:/root/.cache/huggingface
+      - wan-model:/models
+    gpus: all
+    restart: unless-stopped
+    stop_grace_period: 2m
+    depends_on:
+      api:
+        condition: service_healthy
+
+  model-setup:
+    profiles: ["setup"]
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+    volumes:
+      - openvideo-models:/root/.cache/huggingface
+      - wan-model:/models
+    command: ["python3", "scripts/bootstrap_wan.py", "--repo-dir", "/opt/Wan2.2", "--model-dir", "/models/Wan2.2-TI2V-5B", "--skip-dependencies"]
+
+volumes:
+  openvideo-data:
+  openvideo-models:
+  wan-model:
