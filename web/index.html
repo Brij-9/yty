@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>OpenVideo Local</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+  <header><div class="mark">OV</div><div><strong>OpenVideo Local</strong><span>Self-hosted cinematic generation</span></div><div class="pill">NO PAID API</div></header>
+  <main>
+    <section class="hero">
+      <p class="eyebrow">WAN 2.2 · APACHE 2.0</p>
+      <h1>Direct the shot.<br><em>Own the pipeline.</em></h1>
+      <p>Generate original text-to-video or image-guided clips on team-owned GPU hardware. No usage credits and no external generation API.</p>
+    </section>
+    <section class="studio">
+      <form id="generate-form">
+        <div class="mode-switch"><button type="button" data-mode="shot" class="active">Single shot</button><button type="button" data-mode="storyboard">Storyboard</button></div>
+        <div id="shot-fields">
+          <label>Describe the shot<textarea id="prompt" minlength="12" maxlength="1800" placeholder="A probe descends through the amber clouds of Venus, turbulent atmosphere rolling around the camera, cinematic scale, physically coherent motion"></textarea></label>
+          <label class="upload">Optional first frame<input id="source-image" type="file" accept="image/jpeg,image/png,image/webp"><small>Image-guided motion improves subject and composition control. Minimum 512 px.</small></label>
+        </div>
+        <div id="storyboard-fields" hidden>
+          <label>Storyboard title<input id="storyboard-title" maxlength="120" value="Cinematic sequence"></label>
+          <div class="storyboard-head"><strong>Directed shots</strong><button type="button" id="add-shot">+ Add shot</button></div>
+          <div id="shot-list"></div>
+          <label class="continuity"><input id="continuity" type="checkbox" checked> Carry the last frame into the next shot for visual continuity</label>
+          <label class="continuity"><input id="burn-captions" type="checkbox" checked> Burn narration captions into the mastered video</label>
+          <label class="upload">Optional PCM WAV soundtrack<input id="music-file" type="file" accept="audio/wav,audio/x-wav"><small>The worker loops and mixes it beneath narration with limiting.</small></label>
+          <label>Music level<input id="music-volume" type="range" min="0" max="0.5" step="0.01" value="0.12"></label>
+        </div>
+        <div class="grid">
+          <label>Format<select id="aspect"><option value="vertical">Vertical 9:16</option><option value="landscape">Landscape 16:9</option><option value="square">Square</option></select></label>
+          <label>Quality<select id="preset"><option value="preview">Preview</option><option value="balanced" selected>Balanced</option><option value="cinematic">Cinematic</option></select></label>
+          <label>Seed<input id="seed" type="number" value="-1"></label>
+        </div>
+        <details><summary>Motion exclusions</summary><textarea id="negative" placeholder="camera shake, morphing, duplicate objects"></textarea></details>
+        <button class="primary" type="submit">Queue cinematic render <span>→</span></button>
+        <p id="form-message" role="status"></p>
+      </form>
+      <aside>
+        <div class="notice"><strong>Hardware truth</strong><p>Cinematic mode targets a 24 GB NVIDIA GPU. This interface can run anywhere; the open model runs on your own worker.</p></div>
+        <h2>Render queue</h2><div id="jobs" class="jobs"></div>
+      </aside>
+    </section>
+  </main>
+  <script src="/assets/app.js"></script>
+</body>
+</html>
